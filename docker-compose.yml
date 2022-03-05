@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: pw1234
+      POSTGRES_DB: alpine_apps
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/app
+      - bundler_gems:/usr/local/bundle/
+    ports:
+      - "3000:3000"
+    links:
+      - db
+      - redis
+  redis:
+    image: redis
+    ports:
+      - 6379
+    volumes:
+      - redis:/data
+  
+
+volumes:
+  postgres:
+  redis:
+  bundler_gems:
